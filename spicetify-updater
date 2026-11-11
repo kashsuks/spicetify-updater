@@ -40,11 +40,18 @@ for lib in "$SU_ROOT"/lib/*.sh; do
 done
 unset lib
 
+# Settings. Flags in parse_args override these defaults
+COMMAND=""
+
 usage() {
     cat <<'EOF'
-Usage: spicetify-updater [options]
+Usage: spicetify-updater [command] [options]
 
 Re-applies Spicetify after Spotify updates itself.
+
+Commands:
+    run         Re-patch Spotify if needed (default)
+    status      Show the current state without changing anything
 
 Options:
  -h, --help     Show this help and exit
@@ -65,16 +72,34 @@ parse_args() {
                 usage
                 exit "$EX_OK"
                 ;;
+            run | status)
+                if [ -n "$COMMAND" ]; then
+                    usage_error "only one command allowed (got '$COMMAND' and '$1')"
+                fi
+                COMMAND="$1"
+                ;;
             -*) usage_error "unknown option '$1'" ;;
             *) usage_error "unknown command '$1'" ;;
         esac
         shift
     done
+    COMMAND="${COMMAND:-run}"
+}
+
+cmd_run() {
+    echo "run: not implemented yet"
+}
+
+cmd_status() {
+    echo "status: not implemented yet"
 }
 
 main() {
-    :
     parse_args "$@"
+    case "$COMMAND" in
+        run) cmd_run ;;
+        status) cmd_status ;;
+    esac
 }
 
 if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
