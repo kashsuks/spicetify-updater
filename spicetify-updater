@@ -31,6 +31,15 @@ resolve_root() {
 
 SU_ROOT="$(resolve_root)"
 
+# Load every module in lib/. Modules are used to only define functions and constants,
+# so the order they load in doesn't matter
+for lib in "$SU_ROOT"/lib/*.sh; do
+    [ -f "$lib" ] || continue
+    # shellcheck source=/dev/null
+    . "$lib"
+done
+unset lib
+
 main() {
     :
 }
