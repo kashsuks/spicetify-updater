@@ -13,6 +13,24 @@ readonly EX_OK=0 \
     EX_ACTION_NEEDED=10 \
     EX_USAGE=64
 
+# Prints the directory this script lives in. Follows symlinks so a linked
+# install (e.g. in $(brew --prefix)/bin) still finds lib/.
+resolve_root() {
+    local path dir
+    path="${BASH_SOURCE[0]}"
+    while [ -L "$path" ]; do
+        dir="$(cd -P "$(dirname "$path")" && pwd)"
+        path="$(readlink "$path")"
+        case "$path" in
+            /*) ;;
+            *) path="$dir/$path" ;;
+        esac
+    done
+    cd -P "$(dirname "$path")" && pwd
+}
+
+SU_ROOT="$(resolve_root)"
+
 main() {
     :
 }
