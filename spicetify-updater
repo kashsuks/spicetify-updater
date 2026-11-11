@@ -42,6 +42,7 @@ unset lib
 
 # Settings. Flags in parse_args override these defaults
 COMMAND=""
+VERBOSITY=1 # 0 = quiet, 1 = normal, 2 = verbose
 
 usage() {
     cat <<'EOF'
@@ -54,7 +55,9 @@ Commands:
     status      Show the current state without changing anything
 
 Options:
- -h, --help     Show this help and exit
+    -q          Quiet: only print errors
+    -v          Verbose: print extra detail
+    -h, --help  Show this help and exit
 EOF
 }
 
@@ -72,6 +75,8 @@ parse_args() {
                 usage
                 exit "$EX_OK"
                 ;;
+            -q) VERBOSITY=0 ;;
+            -v) VERBOSITY=2 ;;
             run | status)
                 if [ -n "$COMMAND" ]; then
                     usage_error "only one command allowed (got '$COMMAND' and '$1')"
@@ -96,6 +101,9 @@ cmd_status() {
 
 main() {
     parse_args "$@"
+    if [ "$VERBOSITY" -ge 2 ]; then
+        echo "debug: command=$COMMAND" >&2
+    fi
     case "$COMMAND" in
         run) cmd_run ;;
         status) cmd_status ;;
