@@ -4,6 +4,15 @@
 
 set -euo pipefail
 
+readonly EX_OK=0 \
+    EX_PREFLIGHT=1 \
+    EX_CLI_UPDATE=2 \
+    EX_APPLY=3 \
+    EX_VERIFY=4 \
+    EX_LOCKED=5 \
+    EX_ACTION_NEEDED=10 \
+    EX_USAGE=64
+
 main() {
     :
 }
