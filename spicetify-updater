@@ -40,8 +40,32 @@ for lib in "$SU_ROOT"/lib/*.sh; do
 done
 unset lib
 
+usage() {
+    cat <<'EOF'
+Usage: spicetify-updater [options]
+
+Re-applies Spicetify after Spotify updates itself.
+
+Options:
+ -h, --help     Show this help and exit
+EOF
+}
+
+parse_args() {
+    while [ $# -gt 0 ]; do
+        case "$1" in
+            -h | --help)
+                usage
+                exit "$EX_OK"
+                ;;
+        esac
+        shift
+    done
+}
+
 main() {
     :
+    parse_args "$@"
 }
 
 if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
