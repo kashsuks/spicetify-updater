@@ -1,0 +1,13 @@
+#!/bin/bash
+#
+# spicetify-updater: re-applies Spicetify after Spotify updates iteself
+
+set -euo pipefail
+
+main() {
+    :
+}
+
+if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
+    main "$@"
+fi
