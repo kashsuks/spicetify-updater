@@ -51,6 +51,13 @@ Options:
 EOF
 }
 
+# Prints an error and the usage text to stderr, then exits with EX_USAGE
+usage_error() {
+    echo "error: $1" >&2
+    usage >&2
+    exit "$EX_USAGE"
+}
+
 parse_args() {
     while [ $# -gt 0 ]; do
         case "$1" in
@@ -58,6 +65,8 @@ parse_args() {
                 usage
                 exit "$EX_OK"
                 ;;
+            -*) usage_error "unknown option '$1'" ;;
+            *) usage_error "unknown command '$1'" ;;
         esac
         shift
     done
