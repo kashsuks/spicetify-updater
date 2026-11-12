@@ -43,6 +43,8 @@ unset lib
 # Settings. Flags in parse_args override these defaults
 COMMAND=""
 VERBOSITY=1 # 0 = quiet, 1 = normal, 2 = verbose
+DRY_RUN=0
+NO_RELAUNCH=0
 
 usage() {
     cat <<'EOF'
@@ -51,13 +53,15 @@ Usage: spicetify-updater [command] [options]
 Re-applies Spicetify after Spotify updates itself.
 
 Commands:
-    run         Re-patch Spotify if needed (default)
-    status      Show the current state without changing anything
+    run             Re-patch Spotify if needed (default)
+    status          Show the current state without changing anything
 
 Options:
-    -q          Quiet: only print errors
-    -v          Verbose: print extra detail
-    -h, --help  Show this help and exit
+    -q              Quiet: only print errors
+    -v              Verbose: print extra detail
+    --dry-run       Show what would happen without doing it
+    --no-relaunch   Don't reopen Spotify after patching
+    -h, --help      Show this help and exit
 EOF
 }
 
@@ -77,6 +81,8 @@ parse_args() {
                 ;;
             -q) VERBOSITY=0 ;;
             -v) VERBOSITY=2 ;;
+            --dry-run) DRY_RUN=1 ;;
+            --no-relaunch) NO_RELAUNCH=1 ;;
             run | status)
                 if [ -n "$COMMAND" ]; then
                     usage_error "only one command allowed (got '$COMMAND' and '$1')"
@@ -102,7 +108,7 @@ cmd_status() {
 main() {
     parse_args "$@"
     if [ "$VERBOSITY" -ge 2 ]; then
-        echo "debug: command=$COMMAND" >&2
+        echo "debug: command=$COMMAND dry_run=$DRY_RUN no_relaunch=$NO_RELAUNCH" >&2
     fi
     case "$COMMAND" in
         run) cmd_run ;;
