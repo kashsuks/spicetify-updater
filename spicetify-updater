@@ -97,9 +97,9 @@ parse_args() {
     COMMAND="${COMMAND:-run}"
 }
 
-# Logs an errror and exits (default code: EX_PREFLIGHT)
+# Logs an error and exits (default code: EX_PREFLIGHT)
 die() {
-    log_error "error: $1"
+    log_error "$1"
     exit "${2:-$EX_PREFLIGHT}"
 }
 
@@ -112,7 +112,7 @@ require_macos() {
 }
 
 cmd_run() {
-    log_ifo "run: not implemented yet"
+    log_info "run: not implemented yet"
 }
 
 cmd_status() {
@@ -122,6 +122,7 @@ cmd_status() {
 main() {
     parse_args "$@"
     require_macos
+    log_init "$@"
     log_debug "command=$COMMAND dry_run=$DRY_RUN no_relaunch=$NO_RELAUNCH"
     case "$COMMAND" in
         run) cmd_run ;;
