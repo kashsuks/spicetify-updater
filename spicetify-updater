@@ -1,0 +1,136 @@
+#!/bin/bash
+#
+# spicetify-updater: re-applies Spicetify after Spotify updates iteself
+
+set -euo pipefail
+
+readonly EX_OK=0 \
+    EX_PREFLIGHT=1 \
+    EX_CLI_UPDATE=2 \
+    EX_APPLY=3 \
+    EX_VERIFY=4 \
+    EX_LOCKED=5 \
+    EX_ACTION_NEEDED=10 \
+    EX_USAGE=64
+
+# Prints the directory this script lives in. Follows symlinks so a linked
+# install (e.g. in $(brew --prefix)/bin) still finds lib/.
+resolve_root() {
+    local path dir
+    path="${BASH_SOURCE[0]}"
+    while [ -L "$path" ]; do
+        dir="$(cd -P "$(dirname "$path")" && pwd)"
+        path="$(readlink "$path")"
+        case "$path" in
+            /*) ;;
+            *) path="$dir/$path" ;;
+        esac
+    done
+    cd -P "$(dirname "$path")" && pwd
+}
+
+SU_ROOT="$(resolve_root)"
+
+# Load every module in lib/. Modules are used to only define functions and constants,
+# so the order they load in doesn't matter
+for lib in "$SU_ROOT"/lib/*.sh; do
+    [ -f "$lib" ] || continue
+    # shellcheck source=/dev/null
+    . "$lib"
+done
+unset lib
+
+# Settings. Flags in parse_args override these defaults
+COMMAND=""
+VERBOSITY=1 # 0 = quiet, 1 = normal, 2 = verbose
+DRY_RUN=0
+NO_RELAUNCH=0
+
+usage() {
+    cat <<'EOF'
+Usage: spicetify-updater [command] [options]
+
+Re-applies Spicetify after Spotify updates itself.
+
+Commands:
+    run             Re-patch Spotify if needed (default)
+    status          Show the current state without changing anything
+
+Options:
+    -q              Quiet: only print errors
+    -v              Verbose: print extra detail
+    --dry-run       Show what would happen without doing it
+    --no-relaunch   Don't reopen Spotify after patching
+    -h, --help      Show this help and exit
+EOF
+}
+
+# Prints an error and the usage text to stderr, then exits with EX_USAGE
+usage_error() {
+    echo "error: $1" >&2
+    usage >&2
+    exit "$EX_USAGE"
+}
+
+parse_args() {
+    while [ $# -gt 0 ]; do
+        case "$1" in
+            -h | --help)
+                usage
+                exit "$EX_OK"
+                ;;
+            -q) VERBOSITY=0 ;;
+            -v) VERBOSITY=2 ;;
+            --dry-run) DRY_RUN=1 ;;
+            --no-relaunch) NO_RELAUNCH=1 ;;
+            run | status)
+                if [ -n "$COMMAND" ]; then
+                    usage_error "only one command allowed (got '$COMMAND' and '$1')"
+                fi
+                COMMAND="$1"
+                ;;
+            -*) usage_error "unknown option '$1'" ;;
+            *) usage_error "unknown command '$1'" ;;
+        esac
+        shift
+    done
+    COMMAND="${COMMAND:-run}"
+}
+
+# prints an errror to stderr and exits (default code: EX_PREFLIGHT)
+die() {
+    echo "error: $1" >&2
+    exit "${2:-$EX_PREFLIGHT}"
+}
+
+require_macos() {
+    local os
+    os="$(uname -s)"
+    if [ "$os" != "Darwin" ]; then
+        die "spicetify-updater only supports macOS (detected: $os)"
+    fi
+}
+
+cmd_run() {
+    echo "run: not implemented yet"
+}
+
+cmd_status() {
+    echo "status: not implemented yet"
+}
+
+main() {
+    parse_args "$@"
+    if [ "$VERBOSITY" -ge 2 ]; then
+        echo "debug: command=$COMMAND dry_run=$DRY_RUN no_relaunch=$NO_RELAUNCH" >&2
+    fi
+    require_macos
+    case "$COMMAND" in
+        run) cmd_run ;;
+        status) cmd_status ;;
+    esac
+}
+
+if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
+    main "$@"
+fi
