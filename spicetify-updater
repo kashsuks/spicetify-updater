@@ -97,6 +97,20 @@ parse_args() {
     COMMAND="${COMMAND:-run}"
 }
 
+# prints an errror to stderr and exits (default code: EX_PREFLIGHT)
+die() {
+    echo "error: $1" >&2
+    exit "${2:-$EX_PREFLIGHT}"
+}
+
+require_macos() {
+    local os
+    os="$(uname -s)"
+    if [ "$os" != "Darwin" ]; then
+        die "spicetify-updater only supports macOS (detected: $os)"
+    fi
+}
+
 cmd_run() {
     echo "run: not implemented yet"
 }
@@ -110,6 +124,7 @@ main() {
     if [ "$VERBOSITY" -ge 2 ]; then
         echo "debug: command=$COMMAND dry_run=$DRY_RUN no_relaunch=$NO_RELAUNCH" >&2
     fi
+    require_macos
     case "$COMMAND" in
         run) cmd_run ;;
         status) cmd_status ;;
