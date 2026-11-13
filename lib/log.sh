@@ -70,6 +70,8 @@ log_init() {
     _log_file INFO "--- spicetify-updater${*:+ $*} (pid $$)"
 }
 
+# Runs a command, sending its stdout and stderr to the log file, and returns
+# its exit code. With --dry-run it only prints the command.
 run_cmd() {
     local cmd status=0
     cmd="$(printf '%q ' "$@")"
@@ -80,7 +82,7 @@ run_cmd() {
     fi
     log_debug "running: $cmd"
     if [ -n "$LOG_FILE" ]; then
-        "$@" > "$LOG_FILE" 2>&1 || status=$?
+        "$@" >>"$LOG_FILE" 2>&1 || status=$?
     else
         "$@" || status=$?
     fi
