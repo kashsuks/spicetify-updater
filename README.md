@@ -22,6 +22,10 @@ spicetify-updater [command] [options]
 | `--no-relaunch` | Don't reopen Spotify after patching |
 | `-h`, `--help` | Show help |
 
+## Logs
+
+Every run is logged to `~/Library/Logs/spicetify-updater/YYYY-MM-DD.log`, including debug messages and the output of every command it runs. Set `NO_COLOR=1` to turn off colors in the terminal.
+
 ## Exit codes
 
 | Code | Meaning |

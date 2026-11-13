@@ -57,7 +57,7 @@ Commands:
     status          Show the current state without changing anything
 
 Options:
-    -q              Quiet: only print errors
+    -q              Quiet: only print warnings and errors
     -v              Verbose: print extra detail
     --dry-run       Show what would happen without doing it
     --no-relaunch   Don't reopen Spotify after patching
@@ -67,7 +67,7 @@ EOF
 
 # Prints an error and the usage text to stderr, then exits with EX_USAGE
 usage_error() {
-    echo "error: $1" >&2
+    log_error "$1"
     usage >&2
     exit "$EX_USAGE"
 }
@@ -97,9 +97,9 @@ parse_args() {
     COMMAND="${COMMAND:-run}"
 }
 
-# prints an errror to stderr and exits (default code: EX_PREFLIGHT)
+# Logs an error and exits (default code: EX_PREFLIGHT)
 die() {
-    echo "error: $1" >&2
+    log_error "$1"
     exit "${2:-$EX_PREFLIGHT}"
 }
 
@@ -112,19 +112,18 @@ require_macos() {
 }
 
 cmd_run() {
-    echo "run: not implemented yet"
+    log_info "run: not implemented yet"
 }
 
 cmd_status() {
-    echo "status: not implemented yet"
+    log_info "status: not implemented yet"
 }
 
 main() {
     parse_args "$@"
-    if [ "$VERBOSITY" -ge 2 ]; then
-        echo "debug: command=$COMMAND dry_run=$DRY_RUN no_relaunch=$NO_RELAUNCH" >&2
-    fi
     require_macos
+    log_init "$@"
+    log_debug "command=$COMMAND dry_run=$DRY_RUN no_relaunch=$NO_RELAUNCH"
     case "$COMMAND" in
         run) cmd_run ;;
         status) cmd_status ;;
