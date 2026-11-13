@@ -69,3 +69,23 @@ log_init() {
     LOG_FILE="$file"
     _log_file INFO "--- spicetify-updater${*:+ $*} (pid $$)"
 }
+
+run_cmd() {
+    local cmd status=0
+    cmd="$(printf '%q ' "$@")"
+    cmd="${cmd% }"
+    if [ "${DRY_RUN:-0}" -eq 1 ]; then
+        log_info "[dry-run] $cmd"
+        return 0
+    fi
+    log_debug "running: $cmd"
+    if [ -n "$LOG_FILE" ]; then
+        "$@" > "$LOG_FILE" 2>&1 || status=$?
+    else
+        "$@" || status=$?
+    fi
+    if [ "$status" -ne 0 ]; then
+        log_debug "exit $status: $cmd"
+    fi
+    return "$status"
+}
