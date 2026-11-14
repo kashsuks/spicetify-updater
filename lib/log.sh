@@ -95,5 +95,5 @@ run_cmd() {
 log_verdict() {
     local color=$1 symbol=$2 msg=$3
     _log_file INFO "$symbol $msg"
-    _log_print 1 "$color" "$symbol" "$msg"
+    _log_print 1 "$color" "$symbol " "$msg"
 }
