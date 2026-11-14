@@ -2,7 +2,7 @@
 
 Re-applies Spicetify after Spotify updates itself. macOS only.
 
-> Work in progress: `run` and `status` are stubs until milestone 1 is done.
+> Work in progress: `run` is a stub until milestone 1 is done.
 
 ## Usage
 
@@ -21,6 +21,24 @@ spicetify-updater [command] [options]
 | `--dry-run` | Show what would happen without doing it |
 | `--no-relaunch` | Don't reopen Spotify after patching |
 | `-h`, `--help` | Show help |
+
+## Status
+
+`spicetify-updater status` shows what it detects without changing anything:
+
+```
+Spicetify    2.46.4 (/opt/homebrew/bin/spicetify)
+Spotify      1.3.9.2055
+Backup       1.3.9.2055.g806b5b278de8 (made with Spicetify 2.46.4)
+Patch        present
+Theme        marketplace
+Extensions   spicetify-jam.js
+Custom apps  marketplace
+
+✓ up to date
+```
+
+It exits `0` when everything is up to date and `10` when a re-patch is needed, so scripts can use `spicetify-updater status -q` and check the exit code.
 
 ## Logs
 
