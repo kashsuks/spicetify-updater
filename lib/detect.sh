@@ -40,11 +40,11 @@ detect_config_file() {
 
 # spotify Contents/Resources directory
 detect_spotify_resources() {
-    local config_dir=""
+    local config dir=""
     if config="$(detect_config_file)"; then
         dir="$(ini_get "$config" Setting spotify_path)" || dir=""
     fi
-    dir="${dir:-Applications/Spotify.app/Contents/Resources}"
+    dir="${dir:-/Applications/Spotify.app/Contents/Resources}"
     [ -d "$dir" ] || return 1
     echo "${dir%/}"
 }
