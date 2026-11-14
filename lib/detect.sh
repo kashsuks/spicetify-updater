@@ -87,3 +87,29 @@ detect_spotify_version() {
     [ -n "$version" ] || return 1
     echo "$version"
 }
+
+# return 0 if a backup version matches a spotify version. the backup has a
+# build suffix (1.3.8.620.g39b276d5d7ac vs 1.3.8.620), so it matches when it
+# equals the spotify version or it starts with it followed by a bot
+versions_match() {
+    local backup=$1 spotify=$2
+    if [ -z "$backup" ] || [ -z "$spotify" ]; then
+        return 1
+    fi
+    case "$backup" in
+        "$spotify" | "$spotify".*) return 0 ;;
+    esac
+    return 1
+}
+
+# returns 0 if spotify is currently patches by spicetify
+#
+# the xpui folder has a spicetify helper and index.html loads it. a stock or
+# freshly updated spotify only has xpui.spa, so both checks fail
+detect_patch_present() {
+    local resources xpui
+    resources="$(detect_spotify_resources)" || return 1
+    xpui="$resources/Apps/xpui"
+    [ -f "$xpui/helper/spicetifyWrapper.js" ] || return 1
+    grep -q 'spicetifyWrapper' "$xpui/index.html" 2>/dev/null
+}
