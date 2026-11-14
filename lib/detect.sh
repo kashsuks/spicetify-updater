@@ -64,3 +64,26 @@ detect_backup_with() {
     [ -n "$value" ] || return 1
     echo "$value"
 }
+
+detect_spicetify_bin() {
+    command -v spicetify || return 1
+}
+
+detect_cli_version() {
+    local bin version
+    bin="$(detect_spicetify_bin)" || return 1
+    version="$("$bin" -v 2>/dev/null | head -n 1)" || return 1
+    version="$(echo "$version" | tr -d '[:space:]')"
+    [ -n "$version" ] || return 1
+    echo "$version"
+}
+
+detect_spotify_version() {
+    local resources plist version
+    resources="$(detect_spotify_resources)" || return 1
+    plist="$resources/../Info.plist"
+    [ -f "$plist" ] || return 1
+    version="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$plist" 2>/dev/null)" || return 1
+    [ -n "$version" ] || return 1
+    echo "$version"
+}
