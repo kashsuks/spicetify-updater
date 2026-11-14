@@ -113,3 +113,41 @@ detect_patch_present() {
     [ -f "$xpui/helper/spicetifyWrapper.js" ] || return 1
     grep -q 'spicetifyWrapper' "$xpui/index.html" 2>/dev/null
 }
+
+config_get() {
+    local config value
+    config="$(detect_config_file)" || return 1
+    value="$(ini_get "$config" "$1" "$2")" || return 1
+    [ -n "$value" ] || return 1
+    echo "$value"
+}
+
+detect_theme() {
+    config_get Setting current_theme
+}
+
+detect_color_scheme() {
+    config_get Setting color_scheme
+}
+
+detect_extensions() {
+    config AdditionalOptions extensions
+}
+
+detect_custom_apps() {
+    config_get AdditionalOptions custom_apps
+}
+
+# prints the overall state from already-detected facts
+detect_state() {
+    local spotify=$1 backup=$2 patched=$3
+    if [ -z "$backup" ]; then
+        echo no_backup
+    elif ! versions_match "$backup" "$spotify"; then
+        echo spotify_updated
+    elif [ "$patched" -ne 1 ]; then
+        echo patch_missing
+    else
+        echo up_to_date
+    fi
+}
