@@ -115,8 +115,64 @@ cmd_run() {
     log_info "run: not implemented yet"
 }
 
+# one "label value" line of the status summary
+status_field() {
+    log_info "$(printf '%-12s %s' "$1" "$2")"
+}
+
 cmd_status() {
-    log_info "status: not implemented yet"
+    local bin cli spotify backup with theme scheme extensions apps patched state
+    bin="$(detect_spicetify_bin)" || bin=""
+    cli="$(detect_cli_version)" || cli=""
+    spotify="$(detect_spotify_version)" || spotify=""
+    backup="$(detect_backup_version)" || backup=""
+    with="$(detect_backup_with)" || with=""
+    theme="$(detect_theme)" || theme=""
+    scheme="$(detect_color_scheme)" || scheme=""
+    extensions="$(detect_extensions)" || extensions=""
+    apps="$(detect_custom_apps)" || apps=""
+    patched=0
+    if detect_patch_present; then
+        patched=1
+    fi
+
+    status_field "Spicetify" "${cli:-not found}${bin:+ ($bin)}"
+    status_field "Spotify" "${spotify:-not found}"
+    if [ -n "$backup" ] && [ -n "$with" ]; then
+        status_field "Backup" "$backup (made with Spicetify $with)"
+    else
+        status_field "Backup" "${backup:-none}"
+    fi
+    if [ "$patched" -eq 1 ]; then
+        status_field "Patch" "present"
+    else
+        status_field "Patch" "missing"
+    fi
+    status_field "Theme" "${theme:-none}${scheme:+ ($scheme)}"
+    extensions="${extensions//|/, }"
+    apps="${apps//|/, }"
+    status_field "Extensions" "${extensions:-none}"
+    status_field "Custom apps" "${apps:-none}"
+    log_info ""
+
+    if [ -z "$spotify" ]; then
+        die "Spotify not found; is it installed?"
+    fi
+    if [ -z "$bin" ]; then
+        die "spicetify not found on PATH"
+    fi
+
+    state="$(detect_state "$spotify" "$backup" "$patched")"
+    case "$state" in
+        up_to_date)
+            log_verdict 32 "✓" "up to date"
+            exit "$EX_OK"
+            ;;
+        spotify_updated) log_verdict 33 "⚠" "Spotify updated, re-patch needed" ;;
+        patch_missing) log_verdict 33 "⚠" "patch missing" ;;
+        no_backup) log_verdict 33 "⚠" "no Spicetify backup yet, re-patch needed" ;;
+    esac
+    exit "$EX_ACTION_NEEDED"
 }
 
 main() {
