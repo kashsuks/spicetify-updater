@@ -131,7 +131,7 @@ detect_color_scheme() {
 }
 
 detect_extensions() {
-    config AdditionalOptions extensions
+    config_get AdditionalOptions extensions
 }
 
 detect_custom_apps() {
