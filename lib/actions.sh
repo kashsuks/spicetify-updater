@@ -49,3 +49,18 @@ spotify_quit() {
     log_error "couldn't quit Spotify"
     return 1
 }
+
+# Opens Spotify.
+spotify_launch() {
+    log_step "Opening Spotify"
+    run_cmd open -a Spotify
+}
+
+# Reopens Spotify at the end of a manual run, unless --no-relaunch was given.
+spotify_relaunch() {
+    if [ "${NO_RELAUNCH:-0}" -eq 1 ]; then
+        log_info "Not reopening Spotify (--no-relaunch)"
+        return 0
+    fi
+    spotify_launch
+}
